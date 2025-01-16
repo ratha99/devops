@@ -13,7 +13,7 @@ jobs:
       - name: SSH remote to Contabo VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: 212.28.178.254
+          host: 84.247.147.88
           username: root
           key: ${{ secrets.CONTABO_KEY }}  # Private key stored in GitHub Secrets
           port: 22
