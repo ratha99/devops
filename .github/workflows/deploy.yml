@@ -1,52 +1,27 @@
 name: Automate Re-deploy
-
 on:
   push:
     branches:
-      - main  # Trigger the action on pushes to the main branch
-
+      - main
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: SSH remote to Contabo VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 84.247.147.88
           username: root
-          key: ${{ secrets.CONTABO_KEY }}  # Private key stored in GitHub Secrets
+          key: ${{ secrets.CONTABO_KEY }}
           port: 22
           script: |
-            set -e  # Exit immediately if a command exits with a non-zero status
-            
-            # Navigate to the project directory
-            cd dev-ops-ass
-            
-            # Pull the latest changes from the repository with rebase
-            git pull --rebase
-            
-            # Initialize and update git submodules
+            cd devops
+            git pull
             git submodule init
             git submodule update
-            
-            # Load nvm (Node Version Manager) for the current session
-            . ~/.nvm/nvm.sh
-            
-            # Check if Node.js version 16 is installed; install if not
-            if ! nvm ls | grep -q "v16"; then
-                nvm install 16
-            fi
-            
-            # Use Node.js version 16
+            . ~/.nvm/nvm.sh  # Load nvm for the current session
+            nvm install 16     # Install Node.js version 16
             nvm use 16
-            
-            # Uncomment these lines to manage Docker containers
-            # Stop the currently running containers
-            # docker-compose down
-            
-            # Build the Docker containers
-            # docker-compose build
-            
-            # Start the Docker containers in detached mode
-            # docker-compose up -d
+            docker compose down
+            docker compose build
+            docker compose up -d
