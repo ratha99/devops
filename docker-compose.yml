@@ -12,6 +12,8 @@ services:
      - ./backend/src:/app/src
      - ./backend/.env:/app/.env
      - ./backend/test:/app/test
+    networks:
+      - production-networks
   nginx:
     build:
       context: .
@@ -26,13 +28,19 @@ services:
       - NGINX_MAX_BODY=100M
     ports:
       - 8080:8080
+    networks:
+      - production-networks
   frontend:
     container_name: vue-frontend-dev
     build: 
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ./frontend/.nuxt:/app/.nuxt
     ports:
       - 3000:3000
+    networks:
+      - production-networks
   db:
     image: postgres:12
     container_name: tfd-nest-db
@@ -44,10 +52,19 @@ services:
       - 5432:5432
     volumes:
       - postgresdata:/var/lib/postgresql
+    networks:
+      - production-networks
   redis:
     image: redis:5
     container_name: tfd-redis
     ports:
       - 6379:6379
+    networks:
+      - production-networks
 volumes:
   postgresdata:
+   driver: local
+networks:
+  production-networks:
+    name: Nginx
+    external: true
