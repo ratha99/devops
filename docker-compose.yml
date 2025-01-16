@@ -1,0 +1,53 @@
+services:
+  nest:
+    build: 
+      context: .
+      dockerfile: Dockerfile-server
+    container_name: tfd-nest
+    depends_on:
+      - db
+      - redis
+    volumes:
+     - ./backend/upload:/app/upload
+     - ./backend/src:/app/src
+     - ./backend/.env:/app/.env
+     - ./backend/test:/app/test
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile-nginx
+    container_name: tfd-nest-nginx
+    depends_on:
+      - nest
+    environment:
+      - NGINX_SERVER_NAME=localhost
+      - NEST_HOST=nest
+      - NEST_PORT=3000
+      - NGINX_MAX_BODY=100M
+    ports:
+      - 8080:8080
+  frontend:
+    container_name: vue-frontend-dev
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+  db:
+    image: postgres:12
+    container_name: tfd-nest-db
+    environment:
+      POSTGRES_DB: nest
+      POSTGRES_USER: nest
+      POSTGRES_PASSWORD: nest
+    ports:
+      - 5432:5432
+    volumes:
+      - postgresdata:/var/lib/postgresql
+  redis:
+    image: redis:5
+    container_name: tfd-redis
+    ports:
+      - 6379:6379
+volumes:
+  postgresdata:
