@@ -35,8 +35,6 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - ./frontend/.nuxt:/app/.nuxt
     ports:
       - 3000:3000
     networks:
